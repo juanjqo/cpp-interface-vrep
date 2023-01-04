@@ -18,10 +18,14 @@ This file is part of DQ Robotics.
 
 Contributors:
 - Murilo M. Marinho        (murilo@nml.t.u-tokyo.ac.jp)
+        - Responsible for the original implementation.
+
+- Juan Jose Quiroz Omana   (juanjqo@g.ecc.u-tokyo.ac.jp)
+        - Added smart pointers, deprecated raw pointers. (Adapted from DQ_PseudoinverseController.h)
+
 */
 
-#ifndef DQ_ROBOTICS_VREP_ROBOT_HEADER_GUARD
-#define DQ_ROBOTICS_VREP_ROBOT_HEADER_GUARD
+#pragma once
 
 #include<string>
 
@@ -45,5 +49,5 @@ public:
     virtual VectorXd get_q_from_vrep() = 0;
 };
 }
-#endif
+
 
