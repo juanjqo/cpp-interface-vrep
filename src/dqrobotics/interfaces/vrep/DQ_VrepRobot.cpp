@@ -53,4 +53,13 @@ DQ_VrepRobot::DQ_VrepRobot(const std::string& robot_name, DQ_VrepInterface* vrep
         throw std::runtime_error("Null reference to vrep_interface, initialize it first!");
     vrep_interface_ = vrep_interface;
 }
+
+DQ_VrepRobot::DQ_VrepRobot(const std::string& robot_name, const std::shared_ptr<DQ_VrepInterface>& vrep_interface_sptr)
+{
+    robot_name_ = robot_name;
+    if(!vrep_interface_sptr)
+        throw std::runtime_error("Null reference to vrep_interface, initialize it first!");
+    vrep_interface_sptr_ = vrep_interface_sptr;
+}
+
 }

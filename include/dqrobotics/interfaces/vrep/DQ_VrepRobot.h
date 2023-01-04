@@ -26,11 +26,11 @@ Contributors:
 */
 
 #pragma once
-
 #include<string>
-
+#include <memory>
 #include<dqrobotics/robot_modeling/DQ_Kinematics.h>
 #include<dqrobotics/interfaces/vrep/DQ_VrepInterface.h>
+
 namespace DQ_robotics
 {
 class DQ_VrepRobot
@@ -41,8 +41,11 @@ protected:
     std::string robot_name_;
     //Just an observing pointer, we do not take or share ownership (As implied by the raw pointer)
     DQ_VrepInterface* vrep_interface_;
-
+    std::shared_ptr<DQ_VrepInterface> vrep_interface_sptr_;
+    
+    [[deprecated("Use the smart pointer version instead")]]
     DQ_VrepRobot(const std::string& robot_name, DQ_VrepInterface* vrep_interface);
+    DQ_VrepRobot(const std::string& robot_name, const std::shared_ptr<DQ_VrepInterface>& vrep_interface_sptr);
 public:
     virtual ~DQ_VrepRobot() = default;
     virtual void send_q_to_vrep(const VectorXd& q) = 0;
