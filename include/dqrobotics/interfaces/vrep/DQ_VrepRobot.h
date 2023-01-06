@@ -1,5 +1,5 @@
 /**
-(C) Copyright 2019 DQ Robotics Developers
+(C) Copyright 2019-2023 DQ Robotics Developers
 
 This file is part of DQ Robotics.
 
@@ -21,8 +21,8 @@ Contributors:
         - Responsible for the original implementation.
 
 - Juan Jose Quiroz Omana   (juanjqo@g.ecc.u-tokyo.ac.jp)
-        - Added smart pointers, deprecated raw pointers. (Adapted from DQ_PseudoinverseController.h)
-
+        - Added smart pointers, deprecated raw pointers. 
+        (Adapted from DQ_PseudoinverseController.h and DQ_KinematicController.h)
 */
 
 #pragma once
@@ -39,9 +39,15 @@ protected:
     std::vector<std::string> strsplit(const std::string& str, const char& delimiter);
 
     std::string robot_name_;
+    
+
     //Just an observing pointer, we do not take or share ownership (As implied by the raw pointer)
     DQ_VrepInterface* vrep_interface_;
     std::shared_ptr<DQ_VrepInterface> vrep_interface_sptr_;
+
+    //For backwards compatibility reasons, to be removed
+    DQ_VrepInterface* _get_interface_ptr() const;
+    std::shared_ptr<DQ_VrepInterface> _get_interface_sptr() const;
     
     [[deprecated("Use the smart pointer version instead")]]
     DQ_VrepRobot(const std::string& robot_name, DQ_VrepInterface* vrep_interface);
