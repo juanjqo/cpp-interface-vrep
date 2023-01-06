@@ -18,6 +18,11 @@ This file is part of DQ Robotics.
 
 Contributors:
 - Murilo M. Marinho        (murilo@nml.t.u-tokyo.ac.jp)
+        - Responsible for the original implementation.
+
+- Juan Jose Quiroz Omana   (juanjqo@g.ecc.u-tokyo.ac.jp)
+        - Added smart pointers, deprecated raw pointers. 
+        (Adapted from DQ_PseudoinverseController.h and DQ_KinematicController.h)
 */
 
 #include<dqrobotics/interfaces/vrep/robots/LBR4pVrepRobot.h>
@@ -26,9 +31,20 @@ Contributors:
 namespace DQ_robotics
 {
 
+
 LBR4pVrepRobot::LBR4pVrepRobot(const std::string& robot_name, DQ_VrepInterface* vrep_interface): DQ_VrepRobot(robot_name, vrep_interface)
 {
-    std::vector<std::string> splited_name = strsplit(robot_name_,'#');
+  _set_names(robot_name);
+}
+
+LBR4pVrepRobot::LBR4pVrepRobot(const std::string& robot_name, const std::shared_ptr<DQ_VrepInterface>& vrep_interface_sptr): DQ_VrepRobot(robot_name, vrep_interface_sptr)
+{
+  _set_names(robot_name);
+}
+
+void LBR4pVrepRobot::_set_names(const std::string& robot_name)
+{
+  std::vector<std::string> splited_name = strsplit(robot_name_,'#');
     std::string robot_label = splited_name[0];
 
     if(robot_label.compare(std::string("LBR4p")) != 0)
@@ -48,6 +64,7 @@ LBR4pVrepRobot::LBR4pVrepRobot(const std::string& robot_name, DQ_VrepInterface* 
     base_frame_name_ = joint_names_[0];
 
 }
+
 
 DQ_SerialManipulatorDH LBR4pVrepRobot::kinematics()
 {
@@ -70,16 +87,19 @@ DQ_SerialManipulatorDH LBR4pVrepRobot::kinematics()
 
 void LBR4pVrepRobot::send_q_to_vrep(const VectorXd &q)
 {
-    vrep_interface_->set_joint_positions(joint_names_,q);
+    DQ_VrepInterface* local_vrep_interface = _get_interface_ptr();
+    local_vrep_interface->set_joint_positions(joint_names_,q);
 }
 
 void LBR4pVrepRobot::send_q_target_to_vrep(const VectorXd &q_target)
 {
-    vrep_interface_->set_joint_target_positions(joint_names_,q_target);
+    DQ_VrepInterface* local_vrep_interface = _get_interface_ptr();
+    local_vrep_interface->set_joint_target_positions(joint_names_,q_target);
 }
 
 VectorXd LBR4pVrepRobot::get_q_from_vrep()
 {
-    return vrep_interface_->get_joint_positions(joint_names_);
+    DQ_VrepInterface* local_vrep_interface = _get_interface_ptr();
+    return local_vrep_interface->get_joint_positions(joint_names_);
 }
 }
