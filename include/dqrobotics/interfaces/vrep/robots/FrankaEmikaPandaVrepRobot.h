@@ -41,11 +41,11 @@ class FrankaEmikaPandaVrepRobot: public DQ_VrepRobot
     FrankaEmikaPandaVrepRobot(const std::string& robot_name, const std::shared_ptr<DQ_VrepInterface>& vrep_interface_sptr);
     void send_q_to_vrep(const VectorXd &q) override;
     void send_q_target_to_vrep(const VectorXd& q_target);
-    void send_q_dot_target_to_vrep(const VectorXd& q_dot_target) override;
-    void send_torques_target_to_vrep(const VectorXd& torques_target) override;
+    void send_q_dot_target_to_vrep(const VectorXd& q_dot_target);
+    void send_torques_target_to_vrep(const VectorXd& torques_target);
     VectorXd get_q_from_vrep() override;
-    VectorXd get_q_dot_from_vrep() override;
-    DQ get_robot_base_from_vrep(const DQ& base) override;
+    VectorXd get_q_dot_from_vrep();
+    DQ get_robot_base_from_vrep(const DQ& base);
 
     DQ_SerialManipulatorMDH kinematics();
 };
