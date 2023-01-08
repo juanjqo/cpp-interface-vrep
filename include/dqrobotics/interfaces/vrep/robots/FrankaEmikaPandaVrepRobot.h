@@ -40,7 +40,7 @@ class FrankaEmikaPandaVrepRobot: public DQ_VrepRobot
   public:
     FrankaEmikaPandaVrepRobot(const std::string& robot_name, const std::shared_ptr<DQ_VrepInterface>& vrep_interface_sptr);
     void send_q_to_vrep(const VectorXd &q) override;
-    void send_q_target_to_vrep(const VectorXd& q_target) override;
+    void send_q_target_to_vrep(const VectorXd& q_target);
     void send_q_dot_target_to_vrep(const VectorXd& q_dot_target) override;
     void send_torques_target_to_vrep(const VectorXd& torques_target) override;
     VectorXd get_q_from_vrep() override;
