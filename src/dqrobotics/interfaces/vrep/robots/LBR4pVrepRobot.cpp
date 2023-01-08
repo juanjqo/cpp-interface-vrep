@@ -1,5 +1,5 @@
 /**
-(C) Copyright 2019-2022 DQ Robotics Developers
+(C) Copyright 2019-2023 DQ Robotics Developers
 
 This file is part of DQ Robotics.
 
@@ -31,7 +31,6 @@ Contributors:
 namespace DQ_robotics
 {
 
-
 LBR4pVrepRobot::LBR4pVrepRobot(const std::string& robot_name, DQ_VrepInterface* vrep_interface): DQ_VrepRobot(robot_name, vrep_interface)
 {
   _set_names(robot_name);
@@ -62,9 +61,7 @@ void LBR4pVrepRobot::_set_names(const std::string& robot_name)
         joint_names_.push_back(current_joint_name);
     }
     base_frame_name_ = joint_names_[0];
-
 }
-
 
 DQ_SerialManipulatorDH LBR4pVrepRobot::kinematics()
 {
@@ -77,28 +74,24 @@ DQ_SerialManipulatorDH LBR4pVrepRobot::kinematics()
                  pi2,   -pi2,  pi2,-pi2, pi2, -pi2, 0,
             0, 0, 0, 0, 0, 0, 0;
     DQ_SerialManipulatorDH kin(dh);
-    DQ_VrepInterface* local_vrep_interface = _get_interface_ptr();
-    kin.set_reference_frame(local_vrep_interface->get_object_pose(base_frame_name_));
-    kin.set_base_frame(local_vrep_interface->get_object_pose(base_frame_name_));
+    kin.set_reference_frame(_get_interface_ptr()->get_object_pose(base_frame_name_));
+    kin.set_base_frame(_get_interface_ptr()->get_object_pose(base_frame_name_));
     kin.set_effector(1+0.5*E_*k_*0.07);
     return kin;
 }
 
 void LBR4pVrepRobot::send_q_to_vrep(const VectorXd &q)
 {
-    DQ_VrepInterface* local_vrep_interface = _get_interface_ptr();
-    local_vrep_interface->set_joint_positions(joint_names_,q);
+    _get_interface_ptr()->set_joint_positions(joint_names_,q);
 }
 
 void LBR4pVrepRobot::send_q_target_to_vrep(const VectorXd &q_target)
 {
-    DQ_VrepInterface* local_vrep_interface = _get_interface_ptr();
-    local_vrep_interface->set_joint_target_positions(joint_names_,q_target);
+    _get_interface_ptr()->set_joint_target_positions(joint_names_,q_target);
 }
 
 VectorXd LBR4pVrepRobot::get_q_from_vrep()
 {
-    DQ_VrepInterface* local_vrep_interface = _get_interface_ptr();
-    return local_vrep_interface->get_joint_positions(joint_names_);
+    return _get_interface_ptr()->get_joint_positions(joint_names_);
 }
 }

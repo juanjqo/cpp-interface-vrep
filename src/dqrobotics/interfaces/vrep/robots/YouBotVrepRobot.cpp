@@ -1,5 +1,5 @@
 /**
-(C) Copyright 2019-2022 DQ Robotics Developers
+(C) Copyright 2019-2023 DQ Robotics Developers
 
 This file is part of DQ Robotics.
 
@@ -26,7 +26,6 @@ Contributors:
 */
 
 #include<memory>
-
 #include<dqrobotics/robot_modeling/DQ_SerialManipulatorDH.h>
 #include<dqrobotics/robot_modeling/DQ_HolonomicBase.h>
 #include<dqrobotics/interfaces/vrep/robots/YouBotVrepRobot.h>
@@ -107,19 +106,16 @@ void YouBotVrepRobot::send_q_to_vrep(const VectorXd &q)
     DQ p = x * i_ + y * j_;
     DQ pose = (1 +E_*0.5*p)*r;
 
-    DQ_VrepInterface* local_vrep_interface = _get_interface_ptr();
-    local_vrep_interface->set_joint_positions(joint_names_,q.tail<5>());
-    local_vrep_interface->set_object_pose(base_frame_name_, pose * conj(adjust_));
+    _get_interface_ptr()->set_joint_positions(joint_names_,q.tail<5>());
+    _get_interface_ptr()->set_object_pose(base_frame_name_, pose * conj(adjust_));
 }
 
 VectorXd YouBotVrepRobot::get_q_from_vrep()
 {
-    DQ_VrepInterface* local_vrep_interface = _get_interface_ptr();
-    DQ base_x = local_vrep_interface->get_object_pose(base_frame_name_) * adjust_;
+    DQ base_x = _get_interface_ptr()->get_object_pose(base_frame_name_) * adjust_;
     VectorXd base_t = vec4(translation(base_x));
     double base_phi = rotation_angle(rotation(base_x));
-    VectorXd base_arm_q = local_vrep_interface->get_joint_positions(joint_names_);
-
+    VectorXd base_arm_q = _get_interface_ptr()->get_joint_positions(joint_names_);
     VectorXd q(8);
     q << base_t(1), base_t(2), base_phi, base_arm_q;
     return q;

@@ -1,5 +1,5 @@
 /**
-(C) Copyright 2019-2023 DQ Robotics Developers
+(C) Copyright 2023 DQ Robotics Developers
 
 This file is part of DQ Robotics.
 
@@ -17,36 +17,36 @@ This file is part of DQ Robotics.
     along with DQ Robotics.  If not, see <http://www.gnu.org/licenses/>.
 
 Contributors:
-- Murilo M. Marinho        (murilo@nml.t.u-tokyo.ac.jp)
-        - Responsible for the original implementation.
-
 - Juan Jose Quiroz Omana   (juanjqo@g.ecc.u-tokyo.ac.jp)
-        - Added smart pointers, deprecated raw pointers. 
-        (Adapted from DQ_PseudoinverseController.h and DQ_KinematicController.h)
+        - Responsible for the original implementation.
+          (Adapted from LBR4pVrepRobot.h)
 */
 
 #pragma once
 #include <vector>
 #include <dqrobotics/interfaces/vrep/DQ_VrepRobot.h>
-#include <dqrobotics/robot_modeling/DQ_SerialManipulatorDH.h>
+#include <dqrobotics/robot_modeling/DQ_SerialManipulatorMDH.h>
 
 namespace DQ_robotics
 {
-class LBR4pVrepRobot: public DQ_VrepRobot
+class FrankaEmikaPandaVrepRobot: public DQ_VrepRobot
 {
-private:
+  private:
     std::vector<std::string> joint_names_;
+    std::vector<std::string> link_names_;
     std::string base_frame_name_;
+    DQ offset_ = 1+0.5*E_*(-0.07*k_);
     void _set_names(const std::string& robot_name);
-public:
-    [[deprecated("Use the smart pointer version instead")]]
-    LBR4pVrepRobot(const std::string& robot_name, DQ_VrepInterface* vrep_interface);
-    LBR4pVrepRobot(const std::string& robot_name, const std::shared_ptr<DQ_VrepInterface>& vrep_interface_sptr);
-
+  public:
+    FrankaEmikaPandaVrepRobot(const std::string& robot_name, const std::shared_ptr<DQ_VrepInterface>& vrep_interface_sptr);
     void send_q_to_vrep(const VectorXd &q) override;
-    void send_q_target_to_vrep(const VectorXd& q_target);
+    void send_q_target_to_vrep(const VectorXd& q_target) override;
+    void send_q_dot_target_to_vrep(const VectorXd& q_dot_target) override;
+    void send_torques_target_to_vrep(const VectorXd& torques_target) override;
     VectorXd get_q_from_vrep() override;
+    VectorXd get_q_dot_from_vrep() override;
+    DQ get_robot_base_from_vrep(const DQ& base) override;
 
-    DQ_SerialManipulatorDH kinematics();
+    DQ_SerialManipulatorMDH kinematics();
 };
 }
