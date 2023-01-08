@@ -77,11 +77,10 @@ DQ_SerialManipulatorDH LBR4pVrepRobot::kinematics()
                  pi2,   -pi2,  pi2,-pi2, pi2, -pi2, 0,
             0, 0, 0, 0, 0, 0, 0;
     DQ_SerialManipulatorDH kin(dh);
-
-    kin.set_reference_frame(vrep_interface_->get_object_pose(base_frame_name_));
-    kin.set_base_frame(vrep_interface_->get_object_pose(base_frame_name_));
+    DQ_VrepInterface* local_vrep_interface = _get_interface_ptr();
+    kin.set_reference_frame(local_vrep_interface->get_object_pose(base_frame_name_));
+    kin.set_base_frame(local_vrep_interface->get_object_pose(base_frame_name_));
     kin.set_effector(1+0.5*E_*k_*0.07);
-
     return kin;
 }
 
