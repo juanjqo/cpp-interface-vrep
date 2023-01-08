@@ -35,7 +35,7 @@ FrankaEmikaPandaVrepRobot::FrankaEmikaPandaVrepRobot(const std::string& robot_na
 
 void FrankaEmikaPandaVrepRobot::_set_names(const std::string& robot_name)
 {
-    std::vector<std::string> splited_name = strsplit(robot_name_,'#');
+    std::vector<std::string> splited_name = strsplit(robot_name,'#');
     std::string robot_label = splited_name[0];
 
     if(robot_label.compare(std::string("Franka")) != 0)
