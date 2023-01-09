@@ -23,14 +23,15 @@ Contributors:
 */
 #include<dqrobotics/interfaces/vrep/robots/FrankaEmikaPandaVrepRobot.h>
 #include<dqrobotics/utils/DQ_Constants.h>
-#include <dqrobotics/robots/FrankaEmikaPandaRobot.h>
+#include<dqrobotics/robots/FrankaEmikaPandaRobot.h>
 
-namespace DQ_Robotics
+namespace DQ_robotics
 {
 
-FrankaEmikaPandaVrepRobot::FrankaEmikaPandaVrepRobot(const std::string& robot_name, const std::shared_ptr<DQ_VrepInterface>& vrep_interface):DQ_VrepRobot(robot_name, vrep_interface)
+FrankaEmikaPandaVrepRobot::FrankaEmikaPandaVrepRobot(const std::string& robot_name, 
+                          const std::shared_ptr<DQ_VrepInterface>& vrep_interface):DQ_VrepRobot(robot_name, vrep_interface)
 {
-    _set_names(robot_name);
+   _set_names(robot_name);
 }
 
 void FrankaEmikaPandaVrepRobot::_set_names(const std::string& robot_name)
@@ -91,15 +92,9 @@ VectorXd FrankaEmikaPandaVrepRobot::get_q_dot_from_vrep()
 
 DQ_SerialManipulatorMDH FrankaEmikaPandaVrepRobot::kinematics()
 {
-    return FrankaEmikaPandaRobot::kinematics();
+    auto franka = FrankaEmikaPandaRobot::kinematics();
+    franka.set_base_frame(franka.get_reference_frame()*_get_interface_sptr()->get_object_pose(robot_name_)*offset_);
+    return franka;
 }
-
-DQ FrankaEmikaPandaVrepRobot::get_robot_base_from_vrep(const DQ& current_base)
-{
-    return current_base*_get_interface_sptr()->get_object_pose(robot_name_)*(offset_);
-}
-
-
-
 
 }
