@@ -48,7 +48,7 @@ void FrankaEmikaPandaVrepRobot::_set_names(const std::string& robot_name)
     if(splited_name.size() > 1)
         robot_index = "#"+splited_name[1];
 
-    for(int i=1;i<8;i++)
+    for(int i=1;i<dim_configuration_space_+1;i++)
     {
         std::string current_joint_name = robot_label + std::string("_joint") + std::to_string(i) + robot_index;
         joint_names_.push_back(current_joint_name);
@@ -59,24 +59,77 @@ void FrankaEmikaPandaVrepRobot::_set_names(const std::string& robot_name)
     }
 }
 
+/**
+ * @brief Protected method to check if the size of the vector of joint values is valid.
+ * @param q_vec Vector of joint values.
+ * @throws std::runtime_error when the size of  q_vec is invalid.
+ */
+void FrankaEmikaPandaVrepRobot::_check_q_vec(const std::string& msg, const VectorXd &q_vec) const
+{
+    if(q_vec.size() != dim_configuration_space_)
+    {
+        throw std::runtime_error(msg + std::string("Input vector must have size ") + std::to_string(dim_configuration_space_));
+    }
+}
+
+/**
+ * @brief 
+ * 
+ * @param msg 
+ * @param to_ith_link 
+ */
+void FrankaEmikaPandaVrepRobot::_check_to_ith_link(const std::string& msg, const int &to_ith_link) const
+{
+    if(to_ith_link >= dim_configuration_space_ || to_ith_link < 0)
+    {
+        throw std::runtime_error(msg + std::string("Tried to access link index ") + std::to_string(to_ith_link) + std::string(" which is unnavailable."));
+    }
+}
+
 void FrankaEmikaPandaVrepRobot::send_q_to_vrep(const VectorXd &q)
 {
+    _check_q_vec(std::string("Error in send_q_to_vrep. "), q);
     _get_interface_sptr()->set_joint_positions(joint_names_, q);
 }
 
 void FrankaEmikaPandaVrepRobot::send_q_target_to_vrep(const VectorXd& q_target)
 {
+    _check_q_vec(std::string("Error in send_q_target_to_vrep. "), q_target);
     _get_interface_sptr()->set_joint_target_positions(joint_names_, q_target);
 }
 
 void FrankaEmikaPandaVrepRobot::send_q_dot_target_to_vrep(const VectorXd& q_dot_target)
 {
+   _check_q_vec(std::string("Error in send_q_dot_target_to_vrep. "), q_dot_target);
    _get_interface_sptr()->set_joint_target_velocities(joint_names_, q_dot_target);
 }
 
 void FrankaEmikaPandaVrepRobot::send_torques_target_to_vrep(const VectorXd& torques_target)
 {
-   throw std::runtime_error("Not implemented yet ");
+   _check_q_vec(std::string("Error in send_torques_target_to_vrep. "), torques_target);
+   _get_interface_sptr()->set_joint_torques(joint_names_, torques_target);
+}
+
+std::string FrankaEmikaPandaVrepRobot::get_joint_name(const int& ith_joint)
+{
+    _check_to_ith_link(std::string("Error in get_joint_name. "), ith_joint);
+    return joint_names_[ith_joint];
+}
+
+std::vector<std::string> FrankaEmikaPandaVrepRobot::get_joint_names()
+{
+    return joint_names_;
+}
+
+std::string FrankaEmikaPandaVrepRobot::get_link_name(const int& ith_joint)
+{
+    _check_to_ith_link(std::string("Error in get_link_name. "), ith_joint);
+    return link_names_[ith_joint];
+}
+
+std::vector<std::string> FrankaEmikaPandaVrepRobot::get_link_names()
+{
+    return link_names_;
 }
 
 
@@ -88,6 +141,11 @@ VectorXd FrankaEmikaPandaVrepRobot::get_q_from_vrep()
 VectorXd FrankaEmikaPandaVrepRobot::get_q_dot_from_vrep()
 {
    return _get_interface_sptr()->get_joint_velocities(joint_names_);
+}
+
+VectorXd FrankaEmikaPandaVrepRobot::get_torques_from_vrep()
+{
+    return _get_interface_sptr()->get_joint_torques(joint_names_);
 }
 
 DQ_SerialManipulatorMDH FrankaEmikaPandaVrepRobot::kinematics()

@@ -34,9 +34,12 @@ class FrankaEmikaPandaVrepRobot: public DQ_VrepRobot
 private:
     std::vector<std::string> joint_names_;
     std::vector<std::string> link_names_;
+    const int dim_configuration_space_ = 7;
     std::string base_frame_name_;
     DQ offset_ = 1+0.5*E_*(-0.07*k_);
     void _set_names(const std::string& robot_name);
+    void _check_q_vec(const std::string& msg, const VectorXd &q_vec) const;
+    void _check_to_ith_link(const std::string& msg, const int &to_ith_link) const;
 public:
     FrankaEmikaPandaVrepRobot(const std::string& robot_name, const std::shared_ptr<DQ_VrepInterface>& vrep_interface_sptr);
     void send_q_to_vrep(const VectorXd &q) override;
@@ -45,6 +48,11 @@ public:
     void send_torques_target_to_vrep(const VectorXd& torques_target);
     VectorXd get_q_from_vrep() override;
     VectorXd get_q_dot_from_vrep();
+    VectorXd get_torques_from_vrep();
+    std::string get_link_name(const int& ith_link);
+    std::vector<std::string> get_link_names();
+    std::string get_joint_name(const int& ith_link);
+    std::vector<std::string> get_joint_names();
     DQ_SerialManipulatorMDH kinematics();
 };
 }
