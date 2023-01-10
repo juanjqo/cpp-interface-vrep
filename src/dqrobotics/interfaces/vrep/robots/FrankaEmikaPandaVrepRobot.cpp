@@ -28,12 +28,32 @@ Contributors:
 namespace DQ_robotics
 {
 
-FrankaEmikaPandaVrepRobot::FrankaEmikaPandaVrepRobot(const std::string& robot_name, 
-                          const std::shared_ptr<DQ_VrepInterface>& vrep_interface):DQ_VrepRobot(robot_name, vrep_interface)
+/**
+ * @brief Constructor of the FrankaEmikaPandaVrepRobot class
+ * 
+ * @param robot_name The name of robot used on the vrep scene.
+ * @param vrep_interface_sptr The DQ_VrepInterface smart pointer.
+ *  
+ *               Example:
+ *               auto vi = std::make_shared<DQ_VrepInterface>(DQ_VrepInterface());
+ *               vi->connect(19997,100,5);
+ *               vi->start_simulation();
+ *               FrankaEmikaPandaVrepRobot franka_vreprobot("LBR4p", vi);
+ *               auto q = franka_vreprobot.get_q_from_vrep();
+ *               vi->stop_simulation();
+ *               vi->disconnect();
+ */
+FrankaEmikaPandaVrepRobot::FrankaEmikaPandaVrepRobot(const std::string& robot_name, const std::shared_ptr<DQ_VrepInterface>& vrep_interface):DQ_VrepRobot(robot_name, vrep_interface)
 {
    _set_names(robot_name);
 }
 
+
+/**
+ * @brief  sets the joint_names_ and the link_names_ attributes.
+ * 
+ * @param robot_name The name of robot used on the vrep scene.
+ */
 void FrankaEmikaPandaVrepRobot::_set_names(const std::string& robot_name)
 {
     std::vector<std::string> splited_name = strsplit(robot_name,'#');
@@ -61,6 +81,7 @@ void FrankaEmikaPandaVrepRobot::_set_names(const std::string& robot_name)
 
 /**
  * @brief Protected method to check if the size of the vector of joint values is valid.
+ * @param msg Message to be shown.
  * @param q_vec Vector of joint values.
  * @throws std::runtime_error when the size of  q_vec is invalid.
  */
@@ -73,10 +94,10 @@ void FrankaEmikaPandaVrepRobot::_check_q_vec(const std::string& msg, const Vecto
 }
 
 /**
- * @brief 
+ * @brief Protected method to check if the index to a link is valid.
  * 
- * @param msg 
- * @param to_ith_link 
+ * @param msg Message to be shown.
+ * @param to_ith_link to_ith_link The index to a link.
  */
 void FrankaEmikaPandaVrepRobot::_check_to_ith_link(const std::string& msg, const int &to_ith_link) const
 {
@@ -86,68 +107,140 @@ void FrankaEmikaPandaVrepRobot::_check_to_ith_link(const std::string& msg, const
     }
 }
 
+
+/**
+ * @brief 
+ * 
+ * @param q 
+ */
 void FrankaEmikaPandaVrepRobot::send_q_to_vrep(const VectorXd &q)
 {
     _check_q_vec(std::string("Error in send_q_to_vrep. "), q);
     _get_interface_sptr()->set_joint_positions(joint_names_, q);
 }
 
+
+/**
+ * @brief 
+ * 
+ * @param q_target 
+ */
 void FrankaEmikaPandaVrepRobot::send_q_target_to_vrep(const VectorXd& q_target)
 {
     _check_q_vec(std::string("Error in send_q_target_to_vrep. "), q_target);
     _get_interface_sptr()->set_joint_target_positions(joint_names_, q_target);
 }
 
+
+/**
+ * @brief 
+ * 
+ * @param q_dot_target 
+ */
 void FrankaEmikaPandaVrepRobot::send_q_dot_target_to_vrep(const VectorXd& q_dot_target)
 {
    _check_q_vec(std::string("Error in send_q_dot_target_to_vrep. "), q_dot_target);
    _get_interface_sptr()->set_joint_target_velocities(joint_names_, q_dot_target);
 }
 
+
+/**
+ * @brief 
+ * 
+ * @param torques_target 
+ */
 void FrankaEmikaPandaVrepRobot::send_torques_target_to_vrep(const VectorXd& torques_target)
 {
    _check_q_vec(std::string("Error in send_torques_target_to_vrep. "), torques_target);
    _get_interface_sptr()->set_joint_torques(joint_names_, torques_target);
 }
 
+
+/**
+ * @brief 
+ * 
+ * @param ith_joint 
+ * @returns std::string 
+ */
 std::string FrankaEmikaPandaVrepRobot::get_joint_name(const int& ith_joint)
 {
     _check_to_ith_link(std::string("Error in get_joint_name. "), ith_joint);
     return joint_names_[ith_joint];
 }
 
+
+/**
+ * @brief 
+ * 
+ * @returns std::vector<std::string> 
+ */
 std::vector<std::string> FrankaEmikaPandaVrepRobot::get_joint_names()
 {
     return joint_names_;
 }
 
+
+/**
+ * @brief 
+ * 
+ * @param ith_joint 
+ * @returns std::string 
+ */
 std::string FrankaEmikaPandaVrepRobot::get_link_name(const int& ith_joint)
 {
     _check_to_ith_link(std::string("Error in get_link_name. "), ith_joint);
     return link_names_[ith_joint];
 }
 
+
+/**
+ * @brief 
+ * 
+ * @returns std::vector<std::string> 
+ */
 std::vector<std::string> FrankaEmikaPandaVrepRobot::get_link_names()
 {
     return link_names_;
 }
 
-
+/**
+ * @brief 
+ * 
+ * @returns VectorXd 
+ */
 VectorXd FrankaEmikaPandaVrepRobot::get_q_from_vrep()
 {
     return _get_interface_sptr()->get_joint_positions(joint_names_);
 }
 
+
+/**
+ * @brief 
+ * 
+ * @returns VectorXd 
+ */
 VectorXd FrankaEmikaPandaVrepRobot::get_q_dot_from_vrep()
 {
    return _get_interface_sptr()->get_joint_velocities(joint_names_);
 }
 
+
+/**
+ * @brief 
+ * 
+ * @returns VectorXd 
+ */
 VectorXd FrankaEmikaPandaVrepRobot::get_torques_from_vrep()
 {
     return _get_interface_sptr()->get_joint_torques(joint_names_);
 }
 
+
+/**
+ * @brief 
+ * 
+ * @returns DQ_SerialManipulatorMDH 
+ */
 DQ_SerialManipulatorMDH FrankaEmikaPandaVrepRobot::kinematics()
 {
     auto franka = FrankaEmikaPandaRobot::kinematics();
