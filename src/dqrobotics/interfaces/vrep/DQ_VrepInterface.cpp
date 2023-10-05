@@ -1762,6 +1762,7 @@ double DQ_VrepInterface::get_mass(const int& handle, const std::string& function
     return data.output_floats[0];
 }
 
+
 /**
  * @brief This method returns the mass of an object on the CoppeliaSim scene.
  * @param link name. The name of the object from which we want to extract the mass.
@@ -1793,6 +1794,16 @@ double DQ_VrepInterface::get_mass(const std::string& link_name, const std::strin
 {
     return get_mass(_get_handle_from_map(link_name), function_name,obj_name);
 }
+
+
+DQ DQ_VrepInterface::get_gravity()
+{
+    simxFloat tp[3];
+    simxGetArrayParam(clientid_, sim_arrayparam_gravity, tp, _remap_op_mode(OP_BLOCKING));
+    const DQ g(0,tp[0],tp[1],tp[2]);
+    return g;
+}
+
 
 /**
 * @brief This protected method calls remotely a CoppeliaSim script function.

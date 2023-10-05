@@ -187,7 +187,7 @@ public:
     double get_mass(const std::string& link_name, const std::string& function_name = "get_mass", const std::string& obj_name= "DQRoboticsApiCommandServer");
     double get_mass(const int& handle, const std::string& function_name = "get_mass", const std::string& obj_name= "DQRoboticsApiCommandServer");
 
-
+    DQ get_gravity();
 
 private:
     std::map<std::string,DQ_VrepInterfaceMapElement> name_to_element_map_;
