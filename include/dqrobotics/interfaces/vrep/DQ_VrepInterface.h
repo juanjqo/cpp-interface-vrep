@@ -188,6 +188,17 @@ public:
     double get_mass(const int& handle, const std::string& function_name = "get_mass", const std::string& obj_name= "DQRoboticsApiCommandServer");
 
 
+    DQ get_gravity() const;
+    void set_gravity(const DQ& gravity) const;
+
+    //double get_simulation_time_step() const;
+    //void set_simulation_time_step() const;
+
+    //double get_physcis_time_step() const;
+    //void set_physics_time_step() const;
+
+    void enable_dynamics_engine(const bool& flag);
+
 
 private:
     std::map<std::string,DQ_VrepInterfaceMapElement> name_to_element_map_;

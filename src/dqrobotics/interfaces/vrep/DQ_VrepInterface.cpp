@@ -1794,6 +1794,40 @@ double DQ_VrepInterface::get_mass(const std::string& link_name, const std::strin
     return get_mass(_get_handle_from_map(link_name), function_name,obj_name);
 }
 
+
+/**
+ * @brief DQ_VrepInterface::get_gravity
+ * @return
+ */
+DQ DQ_VrepInterface::get_gravity() const
+{
+    simxFloat g[3];
+    simxGetArrayParam(clientid_, sim_arrayparam_gravity, g, _remap_op_mode(OP_BLOCKING));
+    const DQ gravity(0,g[0],g[1],g[2]);
+    return gravity;
+}
+
+
+/**
+ * @brief DQ_VrepInterface::set_gravity
+ * @param gravity
+ */
+void DQ_VrepInterface::set_gravity(const DQ &gravity) const
+{
+    simxFloat g[3];
+    VectorXd vec_gravity = gravity.vec3();
+    for (int i=0;i<=2;i++)
+    {
+        g[i] = vec_gravity[i];
+    }
+    simxSetArrayParam(clientid_, sim_arrayparam_gravity, g, _remap_op_mode(OP_BLOCKING));
+}
+
+void DQ_VrepInterface::enable_dynamics_engine(const bool &flag)
+{
+    simxSetBooleanParameter(clientid_, sim_boolparam_dynamics_handling_enabled, flag, _remap_op_mode(OP_BLOCKING));
+}
+
 /**
 * @brief This protected method calls remotely a CoppeliaSim script function.
 * @param function_name The name of the script function to call in the specified script.
