@@ -1823,24 +1823,39 @@ void DQ_VrepInterface::set_gravity(const DQ &gravity) const
     simxSetArrayParam(clientid_, sim_arrayparam_gravity, g, _remap_op_mode(OP_BLOCKING));
 }
 
+double DQ_VrepInterface::get_simulation_time_step() const
+{
+    simxFloat sts;
+    simxGetFloatParam(clientid_, sim_floatparam_simulation_time_step, &sts, _remap_op_mode(OP_BLOCKING));
+    return double(sts);
+}
+
+void DQ_VrepInterface::set_simulation_time_step(const double& simulation_time_step) const
+{
+    simxFloat sts = simulation_time_step;
+    simxSetFloatParam(clientid_, sim_floatparam_simulation_time_step, sts, _remap_op_mode(OP_BLOCKING));
+}
+
+double DQ_VrepInterface::get_physics_time_step() const
+{
+    simxFloat pts;
+    simxGetFloatParam(clientid_, sim_floatparam_physicstimestep, &pts, _remap_op_mode(OP_BLOCKING));
+    return double(pts);
+}
+
+void DQ_VrepInterface::set_physics_time_step(const double &physics_time_step) const
+{
+    simxFloat pts = physics_time_step;
+    simxSetFloatParam(clientid_, sim_floatparam_simulation_time_step, pts, _remap_op_mode(OP_BLOCKING));
+}
+
 void DQ_VrepInterface::enable_dynamics_engine(const bool &flag)
 {
     simxSetBooleanParameter(clientid_, sim_boolparam_dynamics_handling_enabled, flag, _remap_op_mode(OP_BLOCKING));
 }
 
 
-
-/*
-void DQ_VrepInterface::set_joint_mode(const int &handle, const double &angle_rad, const OP_MODES &opmode) const
-{
-    simxFloat angle_rad_f = simxFloat(angle_rad);
-    simxSetJointPosition(clientid_,handle,angle_rad_f,_remap_op_mode(opmode));
-    simxFloat value;
-    simxGetFloatParam(clientid_, sim_jointmode_kinematic, &value, _remap_op_mode(opmode));
-}
-*/
-
-int DQ_VrepInterface::get_joint_mode(const int &handle, const OP_MODES &opmode) const
+DQ_VrepInterface::JOINT_CONTROL_MODES DQ_VrepInterface::get_joint_control_mode(const int &handle, const OP_MODES &opmode) const
 {
     simxInt value;
     //simxGetObjectInt32Param(clientid_, handle, sim_jointmode_kinematic, &value, _remap_op_mode(opmode));
@@ -1850,28 +1865,26 @@ int DQ_VrepInterface::get_joint_mode(const int &handle, const OP_MODES &opmode) 
     simxGetObjectInt32Param(clientid_, handle, sim_jointintparam_dynctrlmode, &value, _remap_op_mode(opmode));
 
     switch (value) {
-    case sim_jointdynctrl_free:
+    case sim_jointdynctrl_free:  //0
          std::cout<<"sim_jointdynctrl_free"<<std::endl;
-        break;
-    case sim_jointdynctrl_force:
+        return DQ_VrepInterface::JOINT_CONTROL_MODES::FREE;
+    case sim_jointdynctrl_force:  //1
          std::cout<<"sim_jointdynctrl_force"<<std::endl;
-        break;
-    case sim_jointdynctrl_velocity:
+         return DQ_VrepInterface::JOINT_CONTROL_MODES::FORCE;
+    case sim_jointdynctrl_velocity: //4
          std::cout<<"sim_jointdynctrl_velocity"<<std::endl;
-        break;
-    case sim_jointdynctrl_position:
+         return DQ_VrepInterface::JOINT_CONTROL_MODES::VELOCITY;
+    case sim_jointdynctrl_position:  //8
          std::cout<<"sim_jointdynctrl_position"<<std::endl;
-        break;
-    case sim_jointdynctrl_spring:
+         return DQ_VrepInterface::JOINT_CONTROL_MODES::POSITION;
+    case sim_jointdynctrl_spring: // 12
          std::cout<<"sim_jointdynctrl_spring"<<std::endl;
-        break;
-    case sim_jointdynctrl_callback:
+         return DQ_VrepInterface::JOINT_CONTROL_MODES::SPRING;
+    case sim_jointdynctrl_callback: //16
          std::cout<<"sim_jointdynctrl_callback"<<std::endl;
-        break;
-    default:
-        std::cout<<"Indetermined joint mode. "<<std::endl;
-        break;
+         return DQ_VrepInterface::JOINT_CONTROL_MODES::CUSTOM;
     }
+    throw std::range_error("Unknown joint control mode in get_joint_control_mode.");
 
     //enum { /* Joint modes: */
     //    sim_jointmode_kinematic=0,
@@ -1888,13 +1901,69 @@ int DQ_VrepInterface::get_joint_mode(const int &handle, const OP_MODES &opmode) 
     // kinematic mode 32767     32767
     // dependend mode 32764
     // dynamic mode 32766
-    return static_cast<int>(value);
+    //return _remap_joint_control_mode(joint_control_mode);
 }
 
-int DQ_VrepInterface::get_joint_mode(const std::string &jointname, const OP_MODES &opmode)
+DQ_VrepInterface::JOINT_CONTROL_MODES DQ_VrepInterface::get_joint_control_mode(const std::string &jointname, const OP_MODES &opmode)
 {
-   return get_joint_mode(_get_handle_from_map(jointname),opmode);
+    return get_joint_control_mode(_get_handle_from_map(jointname),opmode);
 }
+
+std::vector<DQ_VrepInterface::JOINT_CONTROL_MODES> DQ_VrepInterface::get_joint_control_modes(const std::vector<int> &handles, const OP_MODES &opmode) const
+{
+    std::vector<double>::size_type n = handles.size();
+    std::vector<DQ_VrepInterface::JOINT_CONTROL_MODES> joint_control_modes(n);
+    for(std::vector<double>::size_type i=0;i<n;i++)
+    {
+        joint_control_modes.at(i)=get_joint_control_mode(handles[i],opmode);
+    }
+    return joint_control_modes;
+}
+
+std::vector<DQ_VrepInterface::JOINT_CONTROL_MODES> DQ_VrepInterface::get_joint_control_modes(const std::vector<std::string> &jointnames, const OP_MODES &opmode)
+{
+    std::vector<double>::size_type n = jointnames.size();
+    std::vector<DQ_VrepInterface::JOINT_CONTROL_MODES> joint_control_modes(n);
+    for(std::vector<double>::size_type i=0;i<n;i++)
+    {
+        joint_control_modes.at(i)=get_joint_control_mode(jointnames[i],opmode);
+    }
+    return joint_control_modes;
+}
+
+
+simxInt _remap_joint_control_mode(const DQ_VrepInterface::JOINT_CONTROL_MODES &joint_control_mode)
+{
+    switch (joint_control_mode) {
+    case DQ_VrepInterface::JOINT_CONTROL_MODES::FREE:  //0
+         return sim_jointdynctrl_free;
+    case DQ_VrepInterface::JOINT_CONTROL_MODES::FORCE:  //1
+         return sim_jointdynctrl_force;
+    case DQ_VrepInterface::JOINT_CONTROL_MODES::VELOCITY: //4
+         return sim_jointdynctrl_velocity;
+    case DQ_VrepInterface::JOINT_CONTROL_MODES::POSITION:  //8
+         return sim_jointdynctrl_position;
+    case DQ_VrepInterface::JOINT_CONTROL_MODES::SPRING: // 12
+         return sim_jointdynctrl_spring;
+    case DQ_VrepInterface::JOINT_CONTROL_MODES::CUSTOM: //16
+         return sim_jointdynctrl_callback;
+    }
+    throw std::range_error("Unknown joint_control_mode in _remap_joint_control_mode");
+
+
+
+}
+
+void DQ_VrepInterface::set_joint_control_mode(const int &handle, const JOINT_CONTROL_MODES &joint_control_mode, const OP_MODES &opmode) const
+{
+    simxSetObjectInt32Param(clientid_, handle, sim_jointintparam_dynctrlmode, _remap_joint_control_mode(joint_control_mode), _remap_op_mode(opmode));
+}
+
+void DQ_VrepInterface::set_joint_control_mode(const std::string &jointname, const JOINT_CONTROL_MODES &joint_control_mode, const OP_MODES &opmode)
+{
+   set_joint_control_mode(_get_handle_from_map(jointname), joint_control_mode, opmode);
+}
+
 
 /**
 * @brief This protected method calls remotely a CoppeliaSim script function.

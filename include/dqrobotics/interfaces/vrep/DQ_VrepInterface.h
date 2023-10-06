@@ -62,6 +62,15 @@ public:
         BODY_FRAME,
         ABSOLUTE_FRAME
     };
+    enum JOINT_CONTROL_MODES
+    {
+        FREE,
+        FORCE,
+        VELOCITY,
+        POSITION,
+        SPRING,
+        CUSTOM
+    };
 
 
     DQ_VrepInterface(std::atomic_bool *no_blocking_loops=nullptr);
@@ -191,20 +200,27 @@ public:
     DQ get_gravity() const;
     void set_gravity(const DQ& gravity) const;
 
-    //double get_simulation_time_step() const;
-    //void set_simulation_time_step() const;
+    double get_simulation_time_step() const;
+    void   set_simulation_time_step(const double& simulation_time_step) const;
 
-    //double get_physcis_time_step() const;
-    //void set_physics_time_step() const;
+    double get_physics_time_step() const;
+    void set_physics_time_step(const double& physics_time_step) const;
 
     void enable_dynamics_engine(const bool& flag);
 
-    //void     set_joint_mode(const int& handle, const double& angle_rad, const OP_MODES& opmode) const;
-    //void     set_joint_mode(const std::string& jointname, const double& angle_rad, const OP_MODES& opmode=OP_BLOCKING);
+    void     set_joint_control_mode(const int& handle,
+                                    const JOINT_CONTROL_MODES& joint_control_mode,
+                                    const OP_MODES& opmode) const;
 
-    int     get_joint_mode(const int& handle, const OP_MODES& opmode) const;
-    int     get_joint_mode(const std::string& jointname, const OP_MODES& opmode=OP_BLOCKING);
+    void     set_joint_control_mode(const std::string& jointname,
+                                    const JOINT_CONTROL_MODES& joint_control_mode,
+                                    const OP_MODES& opmode=OP_BLOCKING);
 
+    DQ_VrepInterface::JOINT_CONTROL_MODES get_joint_control_mode(const int& handle, const OP_MODES& opmode) const;
+    DQ_VrepInterface::JOINT_CONTROL_MODES get_joint_control_mode(const std::string& jointname, const OP_MODES& opmode=OP_BLOCKING);
+
+    std::vector<DQ_VrepInterface::JOINT_CONTROL_MODES> get_joint_control_modes(const std::vector<int>& handles, const OP_MODES& opmode) const;
+    std::vector<DQ_VrepInterface::JOINT_CONTROL_MODES> get_joint_control_modes(const std::vector<std::string>& jointnames, const OP_MODES& opmode=OP_BLOCKING);
 
 private:
     std::map<std::string,DQ_VrepInterfaceMapElement> name_to_element_map_;
