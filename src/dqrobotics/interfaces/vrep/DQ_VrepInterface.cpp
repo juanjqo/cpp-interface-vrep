@@ -1828,6 +1828,74 @@ void DQ_VrepInterface::enable_dynamics_engine(const bool &flag)
     simxSetBooleanParameter(clientid_, sim_boolparam_dynamics_handling_enabled, flag, _remap_op_mode(OP_BLOCKING));
 }
 
+
+
+/*
+void DQ_VrepInterface::set_joint_mode(const int &handle, const double &angle_rad, const OP_MODES &opmode) const
+{
+    simxFloat angle_rad_f = simxFloat(angle_rad);
+    simxSetJointPosition(clientid_,handle,angle_rad_f,_remap_op_mode(opmode));
+    simxFloat value;
+    simxGetFloatParam(clientid_, sim_jointmode_kinematic, &value, _remap_op_mode(opmode));
+}
+*/
+
+int DQ_VrepInterface::get_joint_mode(const int &handle, const OP_MODES &opmode) const
+{
+    simxInt value;
+    //simxGetObjectInt32Param(clientid_, handle, sim_jointmode_kinematic, &value, _remap_op_mode(opmode));
+    // simxGetInt32Param(clientid_, handle, sim_jointmode_kinematic, &value, _remap_op_mode(opmode));
+    //simxGetObjectIntParameter(clientid_, handle, sim_jointmode_kinematic, &value, _remap_op_mode(opmode));
+
+    simxGetObjectInt32Param(clientid_, handle, sim_jointintparam_dynctrlmode, &value, _remap_op_mode(opmode));
+
+    switch (value) {
+    case sim_jointdynctrl_free:
+         std::cout<<"sim_jointdynctrl_free"<<std::endl;
+        break;
+    case sim_jointdynctrl_force:
+         std::cout<<"sim_jointdynctrl_force"<<std::endl;
+        break;
+    case sim_jointdynctrl_velocity:
+         std::cout<<"sim_jointdynctrl_velocity"<<std::endl;
+        break;
+    case sim_jointdynctrl_position:
+         std::cout<<"sim_jointdynctrl_position"<<std::endl;
+        break;
+    case sim_jointdynctrl_spring:
+         std::cout<<"sim_jointdynctrl_spring"<<std::endl;
+        break;
+    case sim_jointdynctrl_callback:
+         std::cout<<"sim_jointdynctrl_callback"<<std::endl;
+        break;
+    default:
+        std::cout<<"Indetermined joint mode. "<<std::endl;
+        break;
+    }
+
+    //enum { /* Joint modes: */
+    //    sim_jointmode_kinematic=0,
+    //    sim_jointmode_passive=sim_jointmode_kinematic, /* deprecated */
+    //    sim_jointmode_motion_deprecated, /* deprecated */
+    //    sim_jointmode_ik_deprecated, /* deprecated */
+    //    sim_jointmode_reserved_previously_ikdependent, /* deprecated */
+    //    sim_jointmode_dependent,
+    //    sim_jointmode_dynamic,
+    //    sim_jointmode_force=sim_jointmode_dynamic, /* deprecated */
+    //    sim_jointmode_hybrid_deprecated=32 /* deprecated */
+    //};
+
+    // kinematic mode 32767     32767
+    // dependend mode 32764
+    // dynamic mode 32766
+    return static_cast<int>(value);
+}
+
+int DQ_VrepInterface::get_joint_mode(const std::string &jointname, const OP_MODES &opmode)
+{
+   return get_joint_mode(_get_handle_from_map(jointname),opmode);
+}
+
 /**
 * @brief This protected method calls remotely a CoppeliaSim script function.
 * @param function_name The name of the script function to call in the specified script.

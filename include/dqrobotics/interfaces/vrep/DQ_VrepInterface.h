@@ -199,6 +199,12 @@ public:
 
     void enable_dynamics_engine(const bool& flag);
 
+    //void     set_joint_mode(const int& handle, const double& angle_rad, const OP_MODES& opmode) const;
+    //void     set_joint_mode(const std::string& jointname, const double& angle_rad, const OP_MODES& opmode=OP_BLOCKING);
+
+    int     get_joint_mode(const int& handle, const OP_MODES& opmode) const;
+    int     get_joint_mode(const std::string& jointname, const OP_MODES& opmode=OP_BLOCKING);
+
 
 private:
     std::map<std::string,DQ_VrepInterfaceMapElement> name_to_element_map_;
